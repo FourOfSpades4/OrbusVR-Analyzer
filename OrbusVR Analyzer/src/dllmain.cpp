@@ -2,10 +2,13 @@
 #include <windows.h>
 #include <iostream>
 #include <thread>
+#include "framework.h"
 
 #include "GetDLLPath.h"
 #include "AnalyzerApp.h"
 
+#include <WinSock2.h>
+#include <wx/msw/winundef.h>
 #include <wx/wxprec.h>
 #include <wx/wx.h>
 

@@ -28,6 +28,7 @@
     <ClInclude Include="include\Tools\VRSystem.h" />
     <ClInclude Include="include\UI\AnalyzerApp.h" />
     <ClInclude Include="include\UI\AnalyzerFrame.h" />
+    <ClInclude Include="include\UI\ScoundrelUIController.h" />
     <ClInclude Include="include\UI\SystemSelectFrame.h" />
     <ClInclude Include="include\UI\Theme.h" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClCompile Include="src\Tools\VRSystem.cpp" />
     <ClCompile Include="src\UI\AnalyzerApp.cpp" />
     <ClCompile Include="src\UI\AnalyzerFrame.cpp" />
+    <ClCompile Include="src\UI\ScoundrelUIController.cpp" />
     <ClCompile Include="src\UI\SystemSelectFrame.cpp" />
     <ClCompile Include="src\UI\Theme.cpp" />
   </ItemGroup>
@@ -95,6 +97,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>BlockGamesClient</TargetName>
+  </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>

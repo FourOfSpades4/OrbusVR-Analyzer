@@ -1,5 +1,7 @@
 #pragma once
 
+#include <WinSock2.h>
+#include <wx/msw/winundef.h>
 #include <wx/wx.h>
 #include <memory>
 #include <VRSystem.h>

@@ -1,10 +1,20 @@
 #pragma once
+
 #include <wx/wx.h>
 #include <memory>
 #include <string>
 
 #include "VRSystem.h"
 #include "ConfigParser.h"
+#include "ScoundrelUIController.h"
+#include "Theme.h"
+#include "ConfigParser.h"
+#include "GetDLLPath.h"
+#include "Scoundrel.h"
+
+namespace UI {
+	extern std::unique_ptr<ScoundrelUIController> m_Scoundrel;
+}
 
 class AnalyzerFrame : public wxFrame
 {
@@ -14,8 +24,9 @@ public:
 
 private:
 	std::unique_ptr<wxPanel> m_BackgroundPanel;
-	
-	std::unique_ptr<wxStaticText> m_SystemStatusText;
-	std::unique_ptr<wxButton> m_ApplyChangesButton;
+	std::unique_ptr<wxButton> m_ResetButton;
+
+	void Reset();
+	void OnResetButtonClick(wxEvent& ev);
 };
 

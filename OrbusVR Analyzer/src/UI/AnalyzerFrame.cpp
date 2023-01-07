@@ -1,17 +1,36 @@
 #include <format>
-
 #include "AnalyzerFrame.h"
-#include "Theme.h"
-#include "ConfigParser.h"
-#include "GetDLLPath.h"
 
-AnalyzerFrame::AnalyzerFrame() : wxFrame(nullptr, wxID_ANY, "OrbusVR Class Analyzer", wxDefaultPosition, wxSize(600, 400))
+
+std::unique_ptr<ScoundrelUIController> UI::m_Scoundrel;
+
+AnalyzerFrame::AnalyzerFrame() : wxFrame(nullptr, wxID_ANY, "OrbusVR Class Analyzer", wxDefaultPosition, wxSize(800, 600))
 {
 	// U.I Element creation
 	m_BackgroundPanel = std::make_unique<wxPanel>(this);
 	m_BackgroundPanel->SetBackgroundColour(GuiTheme::GetPanelBackgroundColor());
+
+	std::unique_ptr<wxButton> m_ResetButton = std::make_unique<wxButton>(m_BackgroundPanel.get(), wxID_ANY, "Reset", wxPoint(5, 5), wxSize(120, 35));
+	CONFIGURE_TEXT_THEME(m_ResetButton);
+
+	UI::m_Scoundrel = std::make_unique<ScoundrelUIController>(m_BackgroundPanel.get(), 5, 45, (void*)this);
+
+	m_ResetButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &AnalyzerFrame::OnResetButtonClick, this);
 }
 
 AnalyzerFrame::~AnalyzerFrame()
 {
+}
+
+void AnalyzerFrame::Reset()
+{
+	UI::m_Scoundrel->Reset();
+}
+
+
+void AnalyzerFrame::OnResetButtonClick(wxEvent& ev)
+{
+	m_ResetButton->Disable();
+	Reset();
+	ev.Skip();
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <winsock2.h>
 #include <Minhook.h>
 #include <cstdio>
 #include <fstream>

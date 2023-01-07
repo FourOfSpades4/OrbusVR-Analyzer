@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wx/wx.h>
 #include <unordered_map>
 #include <string>
 #include <optional>

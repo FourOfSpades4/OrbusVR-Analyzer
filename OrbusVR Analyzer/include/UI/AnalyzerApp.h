@@ -2,7 +2,7 @@
 
 #include <wx/wx.h>
 #include "AnalyzerFrame.h"
-#include <SystemSelectFrame.h>
+#include "SystemSelectFrame.h"
 
 class AnalyzerApp : public wxApp
 {
@@ -21,6 +21,6 @@ private:
 
 private:
 	SystemSelectFrame* m_SystemSelectFrame;
-	AnalyzerFrame* m_OrbusCheatsFrame;
+	AnalyzerFrame* m_AnalyzerFrame;
 };
 

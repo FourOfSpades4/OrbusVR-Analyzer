@@ -8,8 +8,6 @@
 #include "ConfigParser.h"
 #include "Hooks.h"
 
-
-
 wxIMPLEMENT_APP_NO_MAIN(AnalyzerApp);
 
 AnalyzerApp::AnalyzerApp()
@@ -30,7 +28,7 @@ bool AnalyzerApp::OnInit()
 
 	// This is very sketchy, and crash prone. But we actually need to construct this AFTER the system is selected
 	// otherwise it won't read the up to date system.
-	m_OrbusCheatsFrame = nullptr;
+	m_AnalyzerFrame = nullptr;
 	
 
 	return true;
@@ -43,8 +41,8 @@ void AnalyzerApp::OnSystemSelectNotification(AnalyzerApp* self)
 	if (selectedSystem != VrSystem::None) {
 		Hooks::Init(selectedSystem);
 
-		self->m_OrbusCheatsFrame = new AnalyzerFrame();
-		self->m_OrbusCheatsFrame->Show();
+		self->m_AnalyzerFrame = new AnalyzerFrame();
+		self->m_AnalyzerFrame->Show();
 
 		self->m_SystemSelectFrame->Close();
 	}

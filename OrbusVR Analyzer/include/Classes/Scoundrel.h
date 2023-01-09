@@ -15,6 +15,12 @@ namespace Hooks {
     extern void(__fastcall* CardDraw)(DWORD*, DWORD*, DWORD*);
     void __stdcall CardDrawHook(DWORD* __this, DWORD* card, DWORD* method);
 
+    extern void(__fastcall* CardUse)(DWORD*, DWORD*, DWORD*);
+    void __stdcall CardUseHook(DWORD* __this, DWORD* card, DWORD* method);
+
+    extern void(__fastcall* Empower)(DWORD*, DWORD*, DWORD*);
+    void __stdcall EmpowerHook(DWORD* __this, DWORD* card, DWORD* method);
+
     extern void(__fastcall* ScoundrelBullet)(DWORD*, DWORD*);
     void __stdcall ScoundrelBulletHook(DWORD* __this, DWORD* method);
 
@@ -81,9 +87,9 @@ namespace Scoundrel {
     extern float necessaryChargeProgress[2];
     extern std::chrono::steady_clock::time_point chargeFinishTime;
 
-    extern Card nextCard[2];
-    extern Card activeCard[2];
-    extern Empowerment empowerment[2];
+    extern Card nextCard;
+    extern Card activeCard;
+    extern Empowerment empowerment;
 
     extern int32_t bullets[2];
     extern int32_t chargedBullets[2];
@@ -100,4 +106,7 @@ namespace Scoundrel {
     static float breakShotDuration = 8;
 
     extern float cardUseDelay;
+
+    extern void Reset();
+    extern void ResetPlayer();
 }

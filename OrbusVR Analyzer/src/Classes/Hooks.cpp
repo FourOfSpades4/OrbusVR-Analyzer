@@ -15,7 +15,7 @@ void Hooks::Init(int version) {
 
 	// Text Set
 	offsets[1][0] = 18139392;
-	offsets[1][1] = 0;
+	offsets[1][1] = 14567920;
 
 	// Scoundrel Bullet Hit
 	offsets[2][0] = 19419072;
@@ -27,23 +27,31 @@ void Hooks::Init(int version) {
 
 	// Card Draw
 	offsets[4][0] = 19416896;
-	offsets[4][1] = 0;
+	offsets[4][1] = 17184096;
 
 	
-	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 19423920), &Hooks::ScoundrelHook, (LPVOID*)&Hooks::Scoundrel);
-	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 19423920));
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17191120), &Hooks::ScoundrelHook, (LPVOID*)&Hooks::Scoundrel);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17191120));
 	
-	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 18139392), &Hooks::TextHook, (LPVOID*)&Hooks::Text);
-	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 18139392));
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 14567920), &Hooks::TextHook, (LPVOID*)&Hooks::Text);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 14567920));
 	
-	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 19419072), &Hooks::ScoundrelBulletHitHook, (LPVOID*)&Hooks::ScoundrelBulletHit);
-	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 19419072));
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17186272), &Hooks::ScoundrelBulletHitHook, (LPVOID*)&Hooks::ScoundrelBulletHit);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17186272));
 
-	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 21786752), &Hooks::ScoundrelBulletHook, (LPVOID*)&Hooks::ScoundrelBullet);
-	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 21786752));
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17147280), &Hooks::ScoundrelBulletHook, (LPVOID*)&Hooks::ScoundrelBullet);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17147280));
 
-	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 19416896), &Hooks::CardDrawHook, (LPVOID*)&Hooks::CardDraw);
-	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 19416896));
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17184096), &Hooks::CardDrawHook, (LPVOID*)&Hooks::CardDraw);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17184096));
+
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17210000), &Hooks::CardUseHook, (LPVOID*)&Hooks::CardUse);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17210000));
+
+	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17201168), &Hooks::EmpowerHook, (LPVOID*)&Hooks::Empower);
+	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17201168));
+
+	
 
 	
 	printf("Created Hook!");

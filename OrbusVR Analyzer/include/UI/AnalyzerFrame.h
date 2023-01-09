@@ -25,8 +25,10 @@ public:
 private:
 	std::unique_ptr<wxPanel> m_BackgroundPanel;
 	std::unique_ptr<wxButton> m_ResetButton;
+	std::unique_ptr<wxButton> m_UnbindPlayerButton;
 
 	void Reset();
 	void OnResetButtonClick(wxEvent& ev);
+	void UnbindPlayer(wxEvent& ev);
 };
 

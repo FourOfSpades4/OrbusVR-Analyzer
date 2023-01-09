@@ -16,8 +16,6 @@ public:
 private:
 	void ParseThemeFileAndUpdate();
 
-private:
-	static void OnSystemSelectNotification(AnalyzerApp* self);
 
 private:
 	SystemSelectFrame* m_SystemSelectFrame;

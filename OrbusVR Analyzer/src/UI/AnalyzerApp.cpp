@@ -20,37 +20,18 @@ AnalyzerApp::~AnalyzerApp()
 
 bool AnalyzerApp::OnInit()
 {
-	SetExitOnFrameDelete(false);
+	SetExitOnFrameDelete(true);
 	ParseThemeFileAndUpdate();
-
-	m_SystemSelectFrame = new SystemSelectFrame((NotificationCallback_t)&AnalyzerApp::OnSystemSelectNotification, this);
-	m_SystemSelectFrame->Show();
 
 	// This is very sketchy, and crash prone. But we actually need to construct this AFTER the system is selected
 	// otherwise it won't read the up to date system.
-	m_AnalyzerFrame = nullptr;
-	
+	Hooks::Init(0);
+	m_AnalyzerFrame = new AnalyzerFrame();
 
+	m_AnalyzerFrame->Show();
+	
 	return true;
 }
-
-void AnalyzerApp::OnSystemSelectNotification(AnalyzerApp* self)
-{
-	VrSystem::System selectedSystem = self->m_SystemSelectFrame->GetSelectedSystem();
-
-	if (selectedSystem != VrSystem::None) {
-		Hooks::Init(selectedSystem);
-
-		self->m_AnalyzerFrame = new AnalyzerFrame();
-		self->m_AnalyzerFrame->Show();
-
-		self->m_SystemSelectFrame->Close();
-	}
-	else {
-		wxMessageBox("Please select which system you are using before continuing", "Please select a system", wxICON_INFORMATION | wxOK);
-	}
-}
-
 void AnalyzerApp::ParseThemeFileAndUpdate()
 {
 	std::string configPath = DllPath::MakeRelative("theme.ini");

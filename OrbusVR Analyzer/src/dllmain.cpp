@@ -55,7 +55,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 DWORD WINAPI Main(LPVOID lpParameter) {
     AllocConsole();
-    // ShowWindow(GetConsoleWindow(), SW_HIDE);
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     FILE* fout;
     FILE* fin;
     freopen_s(&fout, "CONOUT$", "w", stdout);

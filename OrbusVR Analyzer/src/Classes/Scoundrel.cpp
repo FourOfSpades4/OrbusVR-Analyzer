@@ -19,9 +19,9 @@ float Scoundrel::necessaryChargeProgress[2];
 std::chrono::steady_clock::time_point Scoundrel::chargeFinishTime;
 bool finishedCharge = false;
 
-Scoundrel::Card Scoundrel::nextCard[2];
-Scoundrel::Card Scoundrel::activeCard[2];
-Scoundrel::Empowerment Scoundrel::empowerment[2];
+Scoundrel::Card Scoundrel::nextCard;
+Scoundrel::Card Scoundrel::activeCard;
+Scoundrel::Empowerment Scoundrel::empowerment;
 
 int32_t Scoundrel::bullets[2];
 int32_t Scoundrel::chargedBullets[2];
@@ -36,21 +36,27 @@ float Scoundrel::timeSinceRankShot;
 float Scoundrel::cardUseDelay;
 auto lastCardRegen = currentTime;
 
-int8_t Scoundrel::rankShot;
+int8_t Scoundrel::rankShot = 0;
 
 int current = 0;
 
 bool inCombat = false;
+bool firstHit = true;
+bool firstCard = true;
 
 int32_t currentBulletID = 0;
 float wastedTime;
 bool hit = false;
 Scoundrel::Card card;
 Scoundrel::Empowerment empowerment;
-int8_t rankShot;
+int8_t rankShot = 0;
 int32_t bulletsCharged;
 
 std::map<uintptr_t, Scoundrel::Bullet> bullets;
+
+bool correctPlayer(uintptr_t c) {
+
+}
 
 void shotBullet() {
     currentBulletID++;
@@ -70,12 +76,23 @@ void evaluateScoundrel() {
     {
         if ((currentTime - val.lastUpdate).count() / pow(10, 9) > 0.2) {
             bullets[key].hitStatus = hit;
-            bullets[key].card = card;
-            bullets[key].empowerment = empowerment;
             bullets[key].rank = rankShot;
+            if (bullets[key].rank > 5) {
+                bullets[key].rank = 0;
+            }
             bullets[key].bulletsCharged = bulletsCharged;
-
-            UI::m_Scoundrel->PrintShot(bullets[key]);
+            if (card != Scoundrel::NO_CARD) {
+                bullets[key].card = card;
+                bullets[key].empowerment = empowerment;
+                card = Scoundrel::NO_CARD;
+                empowerment = Scoundrel::NO_EMPOWER;
+            }
+            else {
+                bullets[key].card = Scoundrel::NO_CARD;
+                bullets[key].empowerment = Scoundrel::NO_EMPOWER;
+            }
+            UI::m_Scoundrel->PrintShot(bullets[key], firstHit);
+            firstHit = false;
             bullets.erase(key);
             hit = false;
         }
@@ -109,9 +126,9 @@ void __stdcall Hooks::ScoundrelHook(DWORD* __this, DWORD* method) {
         Scoundrel::chargeProgress[current] = *reinterpret_cast<float*>(scoundrelPtr + 0x10 + 552);
         Scoundrel::necessaryChargeProgress[current] = 0.5;
 
-        Scoundrel::nextCard[current] = (Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 672);
-        Scoundrel::activeCard[current] = (Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 674);
-        Scoundrel::empowerment[current] = (Scoundrel::Empowerment) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 675);
+        // Scoundrel::nextCard[current] = (Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 672);
+        // Scoundrel::activeCard[current] = (Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 674);
+        // Scoundrel::empowerment[current] = (Scoundrel::Empowerment) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 675);
 
         Scoundrel::bullets[current] = *reinterpret_cast<int32_t*>(scoundrelPtr + 0x10 + 384 + 0xC);
         Scoundrel::chargedBullets[current] = *reinterpret_cast<int32_t*>(scoundrelPtr + 0x10 + 580 + 0xC);
@@ -123,7 +140,10 @@ void __stdcall Hooks::ScoundrelHook(DWORD* __this, DWORD* method) {
 
         if ((currentTime - previousHitTime).count() / pow(10, 9) > 10) {
             inCombat = false;
-            UI::m_Scoundrel->Reset();
+            firstHit = true;
+            firstCard = true;
+            bullets.clear();
+            // UI::m_Scoundrel->Reset();
         }
 
         evaluateScoundrel();
@@ -132,10 +152,10 @@ void __stdcall Hooks::ScoundrelHook(DWORD* __this, DWORD* method) {
     }
 
     else if (player == NULL) {
-        // if ((Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 674) == Scoundrel::Card::ASH && (Scoundrel::Empowerment) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 675) == Scoundrel::Empowerment::SPREAD) {
+        if ((Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 674) == Scoundrel::Card::ASH && (Scoundrel::Empowerment) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 675) == Scoundrel::Empowerment::SPREAD) {
             printf("Detected player!");
             player = scoundrelPtr;
-        // }
+        }
     }
 
     return Scoundrel(__this, method);
@@ -174,22 +194,51 @@ void __stdcall Hooks::TextHook(DWORD* __this, const char* str, DWORD* method) {
 }
 
 void(__fastcall* Hooks::CardDraw)(DWORD*, DWORD*, DWORD*);
-void __stdcall Hooks::CardDrawHook(DWORD* __this, DWORD* card, DWORD* method) {
+void __stdcall Hooks::CardDrawHook(DWORD* __this, DWORD* c, DWORD* method) {
     if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(card);
+        uintptr_t ptr = reinterpret_cast<uintptr_t>(c);
         uint8_t* cardInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
 
         if (*cardInt != 0) {
             lastCardRegen = std::chrono::steady_clock::now();
+            Scoundrel::nextCard = (Scoundrel::Card) *cardInt;
         }
         else {
-            printf("Card Delay: %f\n\n", (currentTime - lastCardRegen).count() / pow(10, 9));
+            UI::m_Scoundrel->PrintDrawCard(Scoundrel::nextCard, (currentTime - lastCardRegen).count() / pow(10, 9), firstCard);
+            firstCard = false;
         }
-
-        printf("Card: %i\n", *cardInt);
     }
 
-    return CardDraw(__this, card, method);
+    return CardDraw(__this, c, method);
+}
+
+void(__fastcall* Hooks::CardUse)(DWORD*, DWORD*, DWORD*);
+void __stdcall Hooks::CardUseHook(DWORD* __this, DWORD* c, DWORD* method) {
+    if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
+        uintptr_t ptr = reinterpret_cast<uintptr_t>(c);
+        uint8_t* cardInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
+        if (*cardInt != 0) {
+            UI::m_Scoundrel->PrintUseCard((Scoundrel::Card)*cardInt);
+        }
+        else {
+            UI::m_Scoundrel->PrintActivateCard();
+        }
+    }
+
+    return CardUse(__this, c, method);
+}
+
+void(__fastcall* Hooks::Empower)(DWORD*, DWORD*, DWORD*);
+void __stdcall Hooks::EmpowerHook(DWORD* __this, DWORD* e, DWORD* method) {
+    if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
+        uintptr_t ptr = reinterpret_cast<uintptr_t>(e);
+        uint8_t* empowerInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
+        if (*empowerInt != 0) {
+            UI::m_Scoundrel->PrintUseEmpower((Scoundrel::Empowerment)*empowerInt);
+        }
+    }
+
+    return Empower(__this, e, method);
 }
 
 
@@ -197,13 +246,12 @@ void(__fastcall* Hooks::ScoundrelBullet)(DWORD*, DWORD*);
 void __stdcall Hooks::ScoundrelBulletHook(DWORD* __this, DWORD* method) {
     uintptr_t bulletPtr = reinterpret_cast<uintptr_t>(__this);
 
-    if (player == *reinterpret_cast<uintptr_t*>(bulletPtr + 0x10 + 48)) {
+    if (player == *reinterpret_cast<uintptr_t*>(bulletPtr + 0x10 + 48) && inCombat) {
         if (bullets.find(bulletPtr) == bullets.end()) {
             Scoundrel::Bullet b = Scoundrel::Bullet();
             b.id = currentBulletID;
             b.wastedTime = wastedTime;
             bullets[bulletPtr] = b;
-            printf("%i\n", bullets[bulletPtr].id);
         }
         bullets[bulletPtr].lastUpdate = currentTime;
     }
@@ -216,14 +264,34 @@ void __stdcall Hooks::ScoundrelBulletHitHook(DWORD* __this, DWORD* entity, DWORD
     uintptr_t scoundrelPtr = reinterpret_cast<uintptr_t>(__this);
 
     if (scoundrelPtr == player) {
-        previousHitTime = currentTime;
+        if (inCombat) {
+            hit = true;
+            rankShot = Scoundrel::rankShot;
+            bulletsCharged = bullets_charged;
+        }
+        else {
+            bullets.clear();
+        }
         inCombat = true;
-        hit = true;
-        card = Scoundrel::activeCard[current];
-        empowerment = Scoundrel::empowerment[current];
-        rankShot = Scoundrel::rankShot;
-        bulletsCharged = bullets_charged;
+        previousHitTime = currentTime;
     }
 
     return ScoundrelBulletHit(__this, entity, vector, speed, bullets_charged, fullChamber, method);
+}
+
+void Scoundrel::Reset() {
+    previousRankTime = std::chrono::steady_clock::time_point();
+    previousHitTime = std::chrono::steady_clock::time_point();
+
+    bool inCombat = false;
+
+    currentBulletID = 0;
+    wastedTime = 0;
+    hit = false;
+    rankShot = 0;
+    bulletsCharged = 0;
+}
+
+void Scoundrel::ResetPlayer() {
+    player = NULL;
 }

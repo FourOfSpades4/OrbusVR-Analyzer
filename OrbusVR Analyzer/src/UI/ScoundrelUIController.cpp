@@ -15,6 +15,7 @@ int totalBulletRating = 0;
 int totalWastedBullets = 0;
 float totalBulletDelay = 0;
 int totalCardRating = 0;
+int totalCardRankShot = 0;
 float totalCardDelay = 0;
 int totalPoisons = 0;
 int totalFlames = 0;
@@ -435,6 +436,7 @@ void ScoundrelUIController::Reset() {
 	totalCardDelay = 0;
 	totalPoisons = 0;
 	totalFlames = 0;
+	totalCardRankShot = 0;
 
 	Scoundrel::Reset();
 

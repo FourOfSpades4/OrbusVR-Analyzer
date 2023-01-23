@@ -55,7 +55,7 @@ int32_t bulletsCharged;
 std::map<uintptr_t, Scoundrel::Bullet> bullets;
 
 bool correctPlayer(uintptr_t c) {
-
+    return player == *reinterpret_cast<uintptr_t*>(c + 0x10 + 16);
 }
 
 void shotBullet() {
@@ -117,7 +117,7 @@ void(__fastcall* Hooks::Scoundrel)(DWORD*, DWORD*);
 void __stdcall Hooks::ScoundrelHook(DWORD* __this, DWORD* method) {
     uintptr_t scoundrelPtr = reinterpret_cast<uintptr_t>(__this);
 
-    if (player != NULL && scoundrelPtr == player && inCombat) {
+    if (player != NULL && correctPlayer(scoundrelPtr) && inCombat) {
         currentTime = std::chrono::steady_clock::now();
 
         Scoundrel::chargingBullet[current] = *reinterpret_cast<bool*>(scoundrelPtr + 0x10 + 213);
@@ -154,7 +154,7 @@ void __stdcall Hooks::ScoundrelHook(DWORD* __this, DWORD* method) {
     else if (player == NULL) {
         if ((Scoundrel::Card) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 674) == Scoundrel::Card::ASH && (Scoundrel::Empowerment) * reinterpret_cast<uint8_t*>(scoundrelPtr + 0x10 + 675) == Scoundrel::Empowerment::SPREAD) {
             printf("Detected player!");
-            player = scoundrelPtr;
+            player = *reinterpret_cast<uintptr_t*>(scoundrelPtr + 0x10 + 48);
         }
     }
 
@@ -195,7 +195,7 @@ void __stdcall Hooks::TextHook(DWORD* __this, const char* str, DWORD* method) {
 
 void(__fastcall* Hooks::CardDraw)(DWORD*, DWORD*, DWORD*);
 void __stdcall Hooks::CardDrawHook(DWORD* __this, DWORD* c, DWORD* method) {
-    if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
+    if (correctPlayer(reinterpret_cast<uintptr_t>(__this)) && inCombat) {
         uintptr_t ptr = reinterpret_cast<uintptr_t>(c);
         uint8_t* cardInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
 
@@ -214,7 +214,7 @@ void __stdcall Hooks::CardDrawHook(DWORD* __this, DWORD* c, DWORD* method) {
 
 void(__fastcall* Hooks::CardUse)(DWORD*, DWORD*, DWORD*);
 void __stdcall Hooks::CardUseHook(DWORD* __this, DWORD* c, DWORD* method) {
-    if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
+    if (correctPlayer(reinterpret_cast<uintptr_t>(__this)) && inCombat) {
         uintptr_t ptr = reinterpret_cast<uintptr_t>(c);
         uint8_t* cardInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
         if (*cardInt != 0) {
@@ -230,7 +230,7 @@ void __stdcall Hooks::CardUseHook(DWORD* __this, DWORD* c, DWORD* method) {
 
 void(__fastcall* Hooks::Empower)(DWORD*, DWORD*, DWORD*);
 void __stdcall Hooks::EmpowerHook(DWORD* __this, DWORD* e, DWORD* method) {
-    if (reinterpret_cast<uintptr_t>(__this) == player && inCombat) {
+    if (correctPlayer(reinterpret_cast<uintptr_t>(__this)) && inCombat) {
         uintptr_t ptr = reinterpret_cast<uintptr_t>(e);
         uint8_t* empowerInt = reinterpret_cast<uint8_t*>(ptr + 0x10);
         if (*empowerInt != 0) {
@@ -246,7 +246,7 @@ void(__fastcall* Hooks::ScoundrelBullet)(DWORD*, DWORD*);
 void __stdcall Hooks::ScoundrelBulletHook(DWORD* __this, DWORD* method) {
     uintptr_t bulletPtr = reinterpret_cast<uintptr_t>(__this);
 
-    if (player == *reinterpret_cast<uintptr_t*>(bulletPtr + 0x10 + 48) && inCombat) {
+    if (correctPlayer(*reinterpret_cast<uintptr_t*>(bulletPtr + 0x10 + 48)) && inCombat) {
         if (bullets.find(bulletPtr) == bullets.end()) {
             Scoundrel::Bullet b = Scoundrel::Bullet();
             b.id = currentBulletID;
@@ -263,7 +263,7 @@ void(__fastcall* Hooks::ScoundrelBulletHit)(DWORD*, DWORD*, DWORD*, float, int32
 void __stdcall Hooks::ScoundrelBulletHitHook(DWORD* __this, DWORD* entity, DWORD* vector, float speed, int32_t bullets_charged, bool fullChamber, DWORD* method) {
     uintptr_t scoundrelPtr = reinterpret_cast<uintptr_t>(__this);
 
-    if (scoundrelPtr == player) {
+    if (correctPlayer(scoundrelPtr)) {
         if (inCombat) {
             hit = true;
             rankShot = Scoundrel::rankShot;

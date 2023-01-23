@@ -3,6 +3,25 @@
 uintptr_t gameAssembly;
 uintptr_t offsets[1][2];
 
+void MagicalActual_Loot$$EKILKKOCNIM(DWORD* __this, DWORD* encoded, DWORD* method) {
+	/*
+	encoded = 1l2cpp object encoding a string. 0x1A is likely offset
+	something to do with what type of bag? 
+	*/
+}
+
+void MagicalActual_Loot$$EKPAPCPHNPK(DWORD* __this, DWORD* encoded, DWORD* method) {
+	/*
+	encoded = 1l2cpp object encoding a string. 0x1A is likely offset
+	likely string representation of loot
+	*/
+}
+
+/*
+agicalActual.Monster$$ICFNBHPOIOE
+*/
+
+
 
 void Hooks::Init(int version) {
 	MH_Initialize();
@@ -50,8 +69,6 @@ void Hooks::Init(int version) {
 
 	MH_CreateHook(reinterpret_cast<LPVOID*>(gameAssembly + 17201168), &Hooks::EmpowerHook, (LPVOID*)&Hooks::Empower);
 	MH_EnableHook(reinterpret_cast<LPVOID*>(gameAssembly + 17201168));
-
-	
 
 	
 	printf("Created Hook!");
